@@ -23,7 +23,7 @@ case "$1" in
     ;;
   run)
     echo "Starting local server with miniservserve..."
-    miniserve ./web --index web/index.html
+    miniserve ./web --index index.html
     ;;
   *)
     echo "Build completed. No action taken. Use 'deploy' or 'run'."
