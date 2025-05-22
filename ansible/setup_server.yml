@@ -44,7 +44,7 @@
         group: "{{ web_user }}"
         mode: "0755"
 
-    - name: Copy static web files to server
+    - name: Copy web files to server
       copy:
         src: "{{ local_web_path }}/"
         dest: "{{ serve_dir }}/"

@@ -11,15 +11,21 @@ cp target/wasm32-unknown-unknown/release/game.wasm ../web/
 echo "Running wasm-bindgen..."
 cd ../web
 wasm-bindgen --out-name game --out-dir . --target web game.wasm
-
 cd ..
 
-# Check if 'deploy' argument is passed
-if [ "$1" == "deploy" ]; then
+# Handle optional arguments
+case "$1" in
+  deploy)
     echo "Running Ansible playbook..."
     cd ansible
     ansible-playbook -i inventory setup_server.yml
     cd ..
-else
-    echo "Build completed. Skipping deployment."
-fi
+    ;;
+  run)
+    echo "Starting local server with miniservserve..."
+    miniserve ./web --index web/index.html
+    ;;
+  *)
+    echo "Build completed. No action taken. Use 'deploy' or 'run'."
+    ;;
+esac
