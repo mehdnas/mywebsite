@@ -1,0 +1,102 @@
+---
+- name: Set up Apache to serve Bevy game over HTTPS on Raspberry Pi
+  hosts: webserver
+  become: true
+
+  vars:
+    serve_dir: /var/www/mehdi
+    web_user: websrv
+    domain_name: mehdi.raptoroid.com
+    local_web_path: "{{ playbook_dir }}/../web"
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name:
+          - apache2
+          - python3-certbot-apache
+          - ufw
+        state: present
+        update_cache: yes
+
+    - name: Allow HTTP and HTTPS traffic through UFW
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "80"
+        - "443"
+
+    - name: Create dedicated unprivileged web user
+      user:
+        name: "{{ web_user }}"
+        shell: /usr/sbin/nologin
+        home: "{{ serve_dir }}"
+        system: yes
+        create_home: no
+
+    - name: Create Bevy site directory
+      file:
+        path: "{{ serve_dir }}"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_user }}"
+        mode: "0755"
+
+    - name: Copy static web files to server
+      copy:
+        src: "{{ local_web_path }}/"
+        dest: "{{ serve_dir }}/"
+        owner: "{{ web_user }}"
+        group: "{{ web_user }}"
+        mode: "0644"
+
+    - name: Set Apache DocumentRoot to serve Bevy game
+      copy:
+        dest: /etc/apache2/sites-available/000-default.conf
+        content: |
+          <VirtualHost *:80>
+              ServerAdmin webmaster@localhost
+              DocumentRoot {{ serve_dir }}
+
+              <Directory {{ serve_dir }}>
+                  Options Indexes FollowSymLinks
+                  AllowOverride None
+                  Require all granted
+              </Directory>
+
+              ErrorLog ${APACHE_LOG_DIR}/error.log
+              CustomLog ${APACHE_LOG_DIR}/access.log combined
+          </VirtualHost>
+
+    - name: Ensure Apache is enabled and started
+      systemd:
+        name: apache2
+        enabled: yes
+        state: started
+
+    # - name: Obtain Let's Encrypt certificate
+    #   command: >
+    #     certbot --apache --non-interactive --agree-tos
+    #     -m webmaster@{{ domain_name }}
+    #     -d {{ domain_name }}
+
+    - name: Redirect HTTP to HTTPS
+      apache2_module:
+        name: rewrite
+        state: present
+
+    - name: Add HTTP to HTTPS redirect
+      copy:
+        dest: /etc/apache2/sites-available/000-default.conf
+        content: |
+          <VirtualHost *:80>
+              ServerName {{ domain_name }}
+              Redirect permanent / https://{{ domain_name }}/
+          </VirtualHost>
+
+    - name: Reload Apache
+      systemd:
+        name: apache2
+        state: reloaded

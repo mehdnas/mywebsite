@@ -9,6 +9,14 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+ansible/inventory
+
+game.js
+game.wasm
+game.d.ts
+game_bg.wasm
+game_bg.wasm.d.ts
+
 # RustRover
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
