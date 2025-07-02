@@ -70,9 +70,15 @@
         </script>
         <script type="module">
             import init from "./game.js";
-            init().then(() => {
-                document.getElementById("loading")?.remove();
-            });
+            init()
+                .then(() => {
+                    document.getElementById("loading")?.remove();
+                })
+                .catch((err) => {
+                    console.error("WebAssembly load failed:", err);
+                    document.getElementById("loading").innerHTML =
+                        "⚠️ Failed to load game";
+                });
         </script>
 
         <div
