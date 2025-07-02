@@ -16,6 +16,8 @@ game.wasm
 game.d.ts
 game_bg.wasm
 game_bg.wasm.d.ts
+web/assets
+*.blend1
 
 # RustRover
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

@@ -5,8 +5,9 @@ echo "Building game..."
 cd game
 cargo build --release --target wasm32-unknown-unknown
 
-echo "Copying .wasm to web directory..."
+echo "Copying .wasm and assets to web directory..."
 cp target/wasm32-unknown-unknown/release/game.wasm ../web/
+cp -r assets ../web/
 
 echo "Running wasm-bindgen..."
 cd ../web
