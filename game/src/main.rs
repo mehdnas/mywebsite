@@ -22,7 +22,7 @@ fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
 
 fn mesh_movement(time: Res<Time>, mut query: Query<&mut Transform, With<MyMeshMarker>>) {
     let delta = time.delta_secs();
-    let rot = Quat::from_euler(EulerRot::XYZ, delta, delta, 0.0);
+    let rot = Quat::from_euler(EulerRot::XYZ, delta, delta * 0.8, delta * 0.6);
     for mut transform in &mut query {
         transform.rotation = rot * transform.rotation;
     }
